@@ -10,8 +10,15 @@ function helloWorldString() {
     return "Hello";
 }
 
+function helloWorldString2() {
+    return "Hello2";
+}
+
 // module.exports = {
     // helloWorldString,
     // helloWorldString2
 //  }
-export default helloWorldString;
+export {helloWorldString, helloWorldString2};
+
+
+

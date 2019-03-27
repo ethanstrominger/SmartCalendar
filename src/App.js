@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import helloWorldString from './hello-world-functions';
+import { helloWorldString } from './hello-world-functions';
 
 class App extends Component {
   render(){
