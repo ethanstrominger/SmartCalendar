@@ -1,21 +1,20 @@
-import { getICS } from '../smartCalendarUtils';
 import fs from 'fs';
-import ICAL from 'ical.js';
-
+import { getICalEvents } from '../smartCalendarUtils';
 
 const BASIC_ICS_FILE = "src/test/data/basic.ics";
 
-
-test("test data is legitimate ics", () => {
-    const iCalData = fs.readFileSync(BASIC_ICS_FILE);
-    const iCalDataString = iCalData.toString()
-    const startsWithVCalendar = iCalDataString.startsWith("BEGIN:VCALENDAR")
-    expect(startsWithVCalendar).toBeTruthy();
-});
-
-test("convert ICS buffer to JSON", () => {
+test("Convert iCalData to an array of events", () => {
     const iCalData = fs.readFileSync(BASIC_ICS_FILE).toString();
-    const iCalJSON = ICAL.parse(iCalData);
-    console.log(iCalJSON);
+    const vevents = getICalEvents(iCalData);
+    const firstEvent = vevents[0];
+    const expectedAttributes = ["uid","name","starttime","endtime","description"];
+    var attribute;
+    var isAttributeValid;
+    for (var i=0; i < expectedAttributes.length; i++) {
+        attribute = expectedAttributes[i].toString();
+        isAttributeValid = firstEvent.hasOwnProperty(attribute);
+        expect([attribute,isAttributeValid]).toEqual([attribute,true]);
+    } 
 });
+
 
