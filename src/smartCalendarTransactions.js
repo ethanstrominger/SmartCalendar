@@ -9,7 +9,7 @@
 // TODO Try repeating events
 // TODO Try all day meetings
 // TODO See if _getEventsFromCalendarAuth and _getEventsFromAuth can be combined 
-// TODO Why does line 19 or 20 have a red squiggly with unterminated literal
+// TODO Why does unterminated literal red squiggly appear in random place?
 
 import { getOAuth2ClientFromCredentials } from './smartCalendarAuthorization';
 export { getEventsFromCalendar }
