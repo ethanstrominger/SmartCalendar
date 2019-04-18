@@ -4,25 +4,37 @@
 // TODO Add tracing/debugging based on environmental parameter
 // TODO Add linting
 // TODO Consider typeScript?
-// TODO Create function that takes only calendarID, don't expose authorization
-// TODO Move consoleLogEvents to smartCalendarUtils
-// TODO Create separate file for authorization code
-// TODO Oganize tests by file
+// TODO Add location
+// TODO Add tests with and without description
+// TODO Try repeating events
+// TODO Try all day meetings
+// TODO See if _getEventsFromCalendarAuth and _getEventsFromAuth can be combined 
+// TODO Why does line 19 or 20 have a red squiggly with unterminated literal
 
-// Learning TODOs
-// TODO Learn how to get caldav to work
-// TODO Learn how to print out order of lines executed - or add statements to print this out
-// TODO Learn how to debug from command line
-// TODO Figure out why babel-node does not work, expects 7.0 and I can't install
-
+import { getOAuth2ClientFromCredentials } from './smartCalendarAuthorization';
+export { getEventsFromCalendar }
 const { google } = require('googleapis');
-export { consoleLogEvents, getEventsFromCalendarAuth, getEventsFromAuth }
 
-async function getEventsFromCalendarAuth(calendarAuth) {
+async function getEventsFromCalendar (calendarId) {
+    // Issue
+    const oAuth2 = await getOAuth2ClientFromCredentials();
+    console.log("gefc 2");
+    // const calendarAuth = google.calendar({ version: 'v3', auth });
+    const events = await _getEventsFromAuth(oAuth2,calendarId);
+    return events;
+}
+
+async function _getEventsFromAuth(auth, calendarId) {
+    const calendarAuth = google.calendar({ version: 'v3', auth });
+    const events = await _getEventsFromCalendarAuth(calendarAuth,calendarId);
+    return events;
+}
+
+async function _getEventsFromCalendarAuth(calendarAuth, calendarId) {
     return new Promise((resolve, reject) => {
 
         let dateRequest = {
-            calendarId: 'primary',
+            calendarId: calendarId,
             timeMin: (new Date()).toISOString(),
             maxResults: 10,
             singleEvents: true,
@@ -40,29 +52,5 @@ async function getEventsFromCalendarAuth(calendarAuth) {
     });
 }
 
-async function getEventsFromAuth(auth) {
-    const calendar = google.calendar({ version: 'v3', auth });
-    const events = await getEventsFromCalendarAuth(calendar);
-    return events;
-}
 
-async function consoleLogEvents(auth) {
-    const calendar = google.calendar({ version: 'v3', auth });
-    const events = await getEventsFromCalendarAuth(calendar);
-    consoleLogFormatEvents(events);
-}
-
-
-function consoleLogFormatEvents(events) {
-
-    if (events.length) {
-        console.log('Upcoming 10 events:');
-        events.map((event, i) => {
-            const start = event.start.dateTime || event.start.date;
-            console.log(`${start} - ${event.summary}`);
-        });
-    } else {
-        console.log('No upcoming events found.');
-    }
-}
 
