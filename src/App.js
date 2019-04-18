@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import { helloWorldString } from './hello-world-functions';
 
 class App extends Component {
   render(){
-    let var2 = helloWorldString();
-    // alert(var2);
-    console.log(var2);
     return (
       <div className="App">
       <p>Omg</p>

@@ -2,13 +2,14 @@
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
+const { listEvents } = require('./smartCalendarTransactions');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_FILE = 'token.json';
+const TOKEN_FILE = 'smart-calendar-token.json';
 
 main();
 
@@ -22,7 +23,7 @@ async function main() {
  * Create token.json if necessary
  */
 async function getOAuth2ClientFromCredentials() {
-    const unparsedCredentials = fs.readFileSync('credentials.json');
+    const unparsedCredentials = fs.readFileSync('smart-calendar-credentials.json');
     const credentials = JSON.parse(unparsedCredentials);
     const { client_secret, client_id, redirect_uris } = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
@@ -77,49 +78,4 @@ function getCodeFromUserUsingGeneratedUrl(oAuth2Client) {
             resolve(code);
         });
     });
-}
-
-/**
- * Lists the next 10 events on the user's primary calendar.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-async function promiseFunction(calendar) {
-    return new Promise ((resolve, reject) => {
-        console.log("before return");
-
-        let dateRequest = {
-            calendarId: 'primary',
-            timeMin: (new Date()).toISOString(),
-            maxResults: 10,
-            singleEvents: true,
-            orderBy: 'startTime',
-        };
-
-        calendar.events.list(dateRequest, (err, res) => {
-            resolve(res);
-            console.log("Does it go here")
-        });
-        console.log("And it still goes here");
-    
-    });
-
-};
-
-async function listEvents(auth) {
-    const calendar = google.calendar({ version: 'v3', auth });
-
-    let res = await promiseFunction(calendar);
-    console.log (res);
-
-    const events = res.data.items;
-    if (events.length) {
-        console.log('Upcoming 10 events:');
-        events.map((event, i) => {
-            const start = event.start.dateTime || event.start.date;
-            console.log(`${start} - ${event.summary}`);
-        });
-    } else {
-        console.log('No upcoming events found.');
-    }
-
 }
