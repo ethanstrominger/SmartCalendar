@@ -27,7 +27,7 @@ describe("Testing set mock", () => {
             setMockDataEnvVariable(envValue);
             functionName();
             const retval = useMockData();
-            // expect([envValue, functionName.name, retval]).toEqual([envValue, functionName.name, truthValue]);
+            expect([envValue, functionName.name, retval]).toEqual([envValue, functionName.name, truthValue]);
             restoreOriginalMockValues();
         }
 
@@ -35,7 +35,6 @@ describe("Testing set mock", () => {
         testSetMock("Y", turnOffMockData, false);
         testSetMock(undefined, turnOffMockData, false);
         testSetMock("N", undefineUseMockData, false);
-        console.log("Abc");
         testSetMock("Y", undefineUseMockData, true);
     });
 

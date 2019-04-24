@@ -1,8 +1,15 @@
 // TODO Add checks for errors in code and test for all async function
 // TODO Remove duplicate code, create function to check valid events (const expectedAttributes = ["uid","name","starttime","endtime","description"];)
 
-import { getOAuth2ClientFromCredentials } from '../../smartCalendarAuthorization';
-import { getEventsFromCalendar } from '../../smartCalendarTransactions';
+import { getEventsFromCalendar, getEvents2 } from '../../smartCalendarTransactions';
+
+test("Get Events List Using http", signalEndOfTest => {
+    async function testGetEventListUsingHttp() {
+        const events = await getEvents2("primary");
+        signalEndOfTest();
+    }
+    testGetEventListUsingHttp();
+});
 
 test("Get Event List ", signalEndOfTest => {
     async function testGetEventList() {

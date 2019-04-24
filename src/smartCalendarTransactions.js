@@ -11,22 +11,39 @@
 // TODO See if _getEventsFromCalendarAuth and _getEventsFromAuth can be combined 
 // TODO Why does unterminated literal red squiggly appear in random place?
 
-import { getOAuth2ClientFromCredentials } from './smartCalendarAuthorization';
-export { getEventsFromCalendar }
+import { getGoogleCalOAuth2 } from './smartCalendarAuthorization';
+export { getEventsFromCalendar, getEvents2 }
 const { google } = require('googleapis');
 
-async function getEventsFromCalendar (calendarId) {
-    // Issue
-    const oAuth2 = await getOAuth2ClientFromCredentials();
-    console.log("gefc 2");
-    // const calendarAuth = google.calendar({ version: 'v3', auth });
-    const events = await _getEventsFromAuth(oAuth2,calendarId);
+async function getEvents2(calendarId) {
+    const oAuth2 = await getGoogleCalOAuth2();
+    const Http = new XMLHttpRequest();
+    const url = 'https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events';
+    console.log("A");
+    Http.open("GET", url);
+    Http.setRequestHeader('Authorization', 'Bearer ' + window.token2);
+    console.log("b", window.token2);
+    const j = Http.send();
+    console.log("c");
+    return new Promise((resolve, reject) => {
+        Http.onreadystatechange = (e) => {
+            console.log(Http.responseText);
+            resolve(Http.responseText);
+        };
+        console.log("d");
+    });
+}
+
+async function getEventsFromCalendar(calendarId) {
+    const oAuth2 = await getGoogleCalOAuth2();
+    const events = await _getEventsFromAuth(oAuth2, calendarId);
+    // console.log(events);
     return events;
 }
 
 async function _getEventsFromAuth(auth, calendarId) {
     const calendarAuth = google.calendar({ version: 'v3', auth });
-    const events = await _getEventsFromCalendarAuth(calendarAuth,calendarId);
+    const events = await _getEventsFromCalendarAuth(calendarAuth, calendarId);
     return events;
 }
 
