@@ -1,17 +1,26 @@
 // 4/NAFZ51mIEnqApWpwaL9-Hdo5kf42A2nW2FBA5ZAO3KHkzq1nAsDCyls
 // 4/NAF-PRx1PpMtFamKmEuLcKiH__J0jNtI7URBurvmgYtVAR9umS0hRDg
+// Refactoring TODOs
+// TODO Duplicate code for getting credentialFile and token file from prefix - better way to do this? 
 // https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar&response_type=code&client_id=346860590561-gp3lf3l1hp6c3hf4ld9kdlffr3m1kf16.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob
 import { google } from "googleapis/build/src/index";
 import fs from 'fs';
 import readline from 'readline';
 
-export { getGoogleCalOAuth2 };
+export { getAccessTokenString };
 const _SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const _CREDENTIAL_FILE = 'smart-calendar-credentials.json'
-const _TOKEN_FILE = 'smart-calendar-token.json';
+const _DEFAULT_CREDENTIAL_FILE_PREFIX = 'smart-calendar'
 
+async function getAccessTokenString (credentialFilePrefix = _DEFAULT_CREDENTIAL_FILE_PREFIX) {
+    const oAuth2Client = await _getGoogleCalOAuth2(credentialFilePrefix);
+    const accessTokenData = await oAuth2Client.getAccessToken();
+    const accessTokenString = accessTokenData.token;
+    return accessTokenString;
+}
 
-async function getGoogleCalOAuth2(credentialFile = _CREDENTIAL_FILE, tokenFile = _TOKEN_FILE) {
+async function _getGoogleCalOAuth2(credentialFilePrefix = _DEFAULT_CREDENTIAL_FILE_PREFIX) {
+    const credentialFile = credentialFilePrefix+"-credentials.json";
+    const tokenFile = credentialFilePrefix+"-token.json";
     const unparsedCredentials = fs.readFileSync(credentialFile);
     const credentials = JSON.parse(unparsedCredentials);
     const { client_secret, client_id, redirect_uris } = credentials.installed;
@@ -19,9 +28,6 @@ async function getGoogleCalOAuth2(credentialFile = _CREDENTIAL_FILE, tokenFile =
         client_id, client_secret, redirect_uris[0]);
     const tokenData = await _getGoogleCalTokenData(oAuth2Client, tokenFile);
     oAuth2Client.setCredentials(JSON.parse(tokenData));
-    window.token1 = await oAuth2Client.getAccessToken();
-    window.token2 = window.token1.token;
-    // console.log("token 2", window.token2);
     return oAuth2Client;
 }
 
@@ -64,13 +70,9 @@ function _getGoogleCalCodeFromUser(oAuth2Client) {
 async function _getGoogleCalTokenData(oAuth2Client, tokenFile) {
     let token = "";
     try {
-        console.log("A ",tokenFile)
         token = fs.readFileSync(tokenFile)
-        console.log("B");
     } catch (e) {
-        console.log("C");
         token = await _getGoogleCalTokenDataFirstTime(oAuth2Client,tokenFile);
-        console.log("D");
     }
     return token;
 }

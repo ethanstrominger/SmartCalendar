@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { getICalEvents } from '../../smartCalendarUtils';
+import { getICalEvents, consoleLogMode, getCallingMode } from '../../smartCalendarUtils';
 
 
 const BASIC_ICS_FILE = "src/test/data/basic.ics";
@@ -16,6 +16,12 @@ test("Convert iCalData to an array of events", () => {
         isAttributeValid = firstEvent.hasOwnProperty(attribute);
         expect([attribute,isAttributeValid]).toEqual([attribute,true]);
     } 
+});
+
+test("Mode function",() => {
+    console.log("Abc");
+    console.log(getCallingMode());
+    console.log("GD");
 });
 
 

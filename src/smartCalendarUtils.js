@@ -1,14 +1,44 @@
 // Learning TODOs
-// TODO Learn how to get caldav to work
 // TODO Learn how to print out order of lines executed - or add statements to print this out
 // TODO Learn how to debug from command line
-// TODO Figure out why babel-node does not work, expects 7.0 and I cant install
-// TODO Why does unterminated literal red squiggly appear in random place?
 
 import ICAL from 'ical.js';
 import moment from 'moment';
 // If modifying these scopes, delete token.json.
-export { getICalEvents, consoleLogFormatEvents };
+export { getICalEvents, consoleLogFormatEvents, isBrowser, isTestingWithJest, isCommandLine, getCallingMode };
+
+function getCallingMode()
+{
+    console.log("Xyz");
+    console.log("Browser",isBrowser(),"command",isCommandLine(),"jest",isTestingWithJest());
+    let browseMode = "";
+    if (isBrowser()) {
+        browseMode = "TRUE";
+    } else {
+        browseMode = "FALSE";
+    }
+    // console.log("What is going on");
+    console.log("isbrowser",isBrowser());
+    console.log("Browser",browseMode);
+
+    return true;
+}
+
+// TODO Refactor?  Would making detectFunction an actual function work?
+// TODO See 
+function isBrowser() {
+    const detectFunction=new Function("try {return this===window;}catch(e){ return false;}");
+    return detectFunction();
+}
+
+function isCommandLine() {
+    var detectFunction=new Function("try {return this===global;}catch(e){return false;}");
+    return detectFunction();
+}
+
+function isTestingWithJest() {
+    return process.env.JEST_WORKER_ID !== undefined;
+}
 
 function getICalEvents(iCalData) {
     var jcal = ICAL.parse(iCalData);

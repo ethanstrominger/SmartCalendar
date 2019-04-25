@@ -1,34 +1,15 @@
 // TODO Add checks for errors in code and test for all async function
 // TODO Remove duplicate code, create function to check valid events (const expectedAttributes = ["uid","name","starttime","endtime","description"];)
 
-import { getEventsFromCalendar, getEvents2 } from '../../smartCalendarTransactions';
+import { getEvents, getGoogleGetEventURL } from '../../smartCalendarTransactions';
 
 test("Get Events List Using http", signalEndOfTest => {
     async function testGetEventListUsingHttp() {
-        const events = await getEvents2("primary");
+        const events = await getEvents("primary",getGoogleGetEventURL());
+        expect(events).toBeDefined();
         signalEndOfTest();
     }
     testGetEventListUsingHttp();
-});
-
-test("Get Event List ", signalEndOfTest => {
-    async function testGetEventList() {
-        const events = await getEventsFromCalendar("primary");
-        expect(events).toBeDefined();
-        expect(events.length).toBeGreaterThan(0);
-        const firstEvent = events[0];
-        const expectedAttributes = ["id", "summary", "start", "end", "description"];
-        var attribute;
-        var isAttributeValid;
-        for (var i = 0; i < expectedAttributes.length; i++) {
-            attribute = expectedAttributes[i].toString();
-            console.log(attribute);
-            isAttributeValid = firstEvent.hasOwnProperty(attribute);
-            expect([attribute, isAttributeValid]).toEqual([attribute, true]);
-            signalEndOfTest();
-        }
-    }
-    testGetEventList();
 });
 
 
@@ -46,3 +27,24 @@ test("Add event", function () {
         }
     );
 });
+
+// test("Get Event List ", signalEndOfTest => {
+//     async function testGetEventList() {
+//         const events = await getEventsFromCalendar("primary");
+//         expect(events).toBeDefined();
+//         expect(events.length).toBeGreaterThan(0);
+//         const firstEvent = events[0];
+//         const expectedAttributes = ["id", "summary", "start", "end", "description"];
+//         var attribute;
+//         var isAttributeValid;
+//         for (var i = 0; i < expectedAttributes.length; i++) {
+//             attribute = expectedAttributes[i].toString();
+//             console.log(attribute);
+//             isAttributeValid = firstEvent.hasOwnProperty(attribute);
+//             expect([attribute, isAttributeValid]).toEqual([attribute, true]);
+//             signalEndOfTest();
+//         }
+//     }
+//     testGetEventList();
+// });
+
