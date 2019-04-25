@@ -5,34 +5,18 @@
 import ICAL from 'ical.js';
 import moment from 'moment';
 // If modifying these scopes, delete token.json.
-export { getICalEvents, consoleLogFormatEvents, isBrowser, isTestingWithJest, isCommandLine, getCallingMode };
-
-function getCallingMode()
-{
-    console.log("Xyz");
-    console.log("Browser",isBrowser(),"command",isCommandLine(),"jest",isTestingWithJest());
-    let browseMode = "";
-    if (isBrowser()) {
-        browseMode = "TRUE";
-    } else {
-        browseMode = "FALSE";
-    }
-    // console.log("What is going on");
-    console.log("isbrowser",isBrowser());
-    console.log("Browser",browseMode);
-
-    return true;
-}
+export { getICalEvents, consoleLogFormatEvents, isBrowser, isTestingWithJest, isCommandLine };
 
 // TODO Refactor?  Would making detectFunction an actual function work?
-// TODO See 
+// TODO Learn why this works below
+// TODO See https://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser/31090240
 function isBrowser() {
-    const detectFunction=new Function("try {return this===window;}catch(e){ return false;}");
+    const detectFunction = new Function("try {return this===window;}catch(e){ return false;}");
     return detectFunction();
 }
 
 function isCommandLine() {
-    var detectFunction=new Function("try {return this===global;}catch(e){return false;}");
+    var detectFunction = new Function("try {return this===global;}catch(e){return false;}");
     return detectFunction();
 }
 
