@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { getICalEvents, consoleLogMode, getCallingMode, isBrowser, isCommandLine, isTestingWithJest } from '../../smartCalendarUtils';
+import { getICalEvents, isBrowser, isCommandLine, isTestingWithJest } from '../../smartCalendarUtils';
 
 
 const BASIC_ICS_FILE = "src/test/data/basic.ics";
