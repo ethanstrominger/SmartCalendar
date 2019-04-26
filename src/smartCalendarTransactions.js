@@ -19,29 +19,30 @@
 // TODO Add eventBrite
 // TODO Figure out if google, meetup, facebook, eventbrite based on credentials
 
-
-import { getAccessTokenString } from './smartCalendarAuthorization';
-export { getEvents, getGoogleGetEventURL }
-const _CALENDARID_STR = "$calendarId"
-const _GOOGLE_GET_EVENT_URL = 'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events';
+import { getAccessTokenString } from "./smartCalendarAuthorization";
+export { getEvents, getGoogleGetEventURL };
+const _CALENDARID_STR = "$calendarId";
+const _GOOGLE_GET_EVENT_URL =
+  "https://www.googleapis.com/calendar/v3/calendars/$calendarId/events";
 
 function getGoogleGetEventURL(calendarId) {
-    let url = _GOOGLE_GET_EVENT_URL.replace(_CALENDARID_STR,calendarId);
-    return url;
+  let url = _GOOGLE_GET_EVENT_URL.replace(_CALENDARID_STR, calendarId);
+  return url;
 }
 
 async function getEvents(calendarId) {
-    const accessTokenString = await getAccessTokenString();
-    const Http = new XMLHttpRequest();
-    Http.open("GET", getGoogleGetEventURL(calendarId));
-    Http.setRequestHeader('Authorization', 'Bearer ' + accessTokenString);
-    Http.send();
-    return new Promise((resolve, reject) => {
-        Http.onreadystatechange = (e) => {
-            console.log("Returning response");
-            resolve(Http.responseText);
-        };
-    });
+  const accessTokenString = await getAccessTokenString();
+  const Http = new XMLHttpRequest();
+  Http.open("GET", getGoogleGetEventURL(calendarId));
+  Http.setRequestHeader("Authorization", "Bearer " + accessTokenString);
+  const j = await Http.send();
+  console.log("A", Http.readyState);
+  return new Promise((resolve, reject) => {
+    Http.onload = e => {
+      console.log(Http.responseText.items);
+      resolve(Http.responseText);
+    };
+  });
 }
 
 // async function getEventsFromCalendar(calendarId) {
@@ -78,6 +79,3 @@ async function getEvents(calendarId) {
 //         });
 //     });
 // }
-
-
-

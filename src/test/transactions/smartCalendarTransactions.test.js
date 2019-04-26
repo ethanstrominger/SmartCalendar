@@ -6,7 +6,9 @@ import { getEvents, getGoogleGetEventURL } from '../../smartCalendarTransactions
 test("Get Events List Using http", signalEndOfTest => {
     async function testGetEventListUsingHttp() {
         const events = await getEvents("primary",getGoogleGetEventURL());
+        console.log("Here");
         expect(events).toBeDefined();
+        console.log("There 2",events);
         signalEndOfTest();
     }
     testGetEventListUsingHttp();
