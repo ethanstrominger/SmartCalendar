@@ -8,6 +8,9 @@
 # testing
 /coverage
 
+# play
+src/play
+
 # production
 /build
 

@@ -19,8 +19,10 @@
 // TODO Add eventBrite
 // TODO Figure out if google, meetup, facebook, eventbrite based on credentials
 
+import moment from "moment";
+import ICAL from "ical.js";
 import { getAccessTokenString } from "./smartCalendarAuthorization";
-export { getEvents, getGoogleGetEventURL };
+export { getEvents, getGoogleGetEventURL, getICalEvents };
 const _CALENDARID_STR = "$calendarId";
 const _GOOGLE_GET_EVENT_URL =
   "https://www.googleapis.com/calendar/v3/calendars/$calendarId/events";
@@ -36,15 +38,30 @@ async function getEvents(calendarId) {
   Http.open("GET", getGoogleGetEventURL(calendarId));
   Http.setRequestHeader("Authorization", "Bearer " + accessTokenString);
   const j = await Http.send();
-  console.log("A", Http.readyState);
   return new Promise((resolve, reject) => {
     Http.onload = e => {
-      console.log(Http.responseText.items);
-      resolve(Http.responseText);
+      resolve(JSON.parse(Http.responseText)["items"]);
     };
   });
 }
 
+function getICalEvents(iCalData) {
+  var jcal = ICAL.parse(iCalData);
+  var vcal = new ICAL.Component(jcal);
+  var vevents = vcal.getAllSubcomponents("vevent");
+  return vevents.map(_getICalEventAtrributes);
+}
+
+function _getICalEventAtrributes(vevent) {
+  var element = {
+    uid: vevent.getFirstPropertyValue("uid"),
+    name: vevent.getFirstPropertyValue("summary"),
+    starttime: moment(vevent.getFirstPropertyValue("dtstart")).format(),
+    endtime: moment(vevent.getFirstPropertyValue("dtend")).format(),
+    description: vevent.getFirstPropertyValue("description")
+  };
+  return element;
+}
 // async function getEventsFromCalendar(calendarId) {
 //     const oAuth2 = await getGoogleCalOAuth2();
 //     const events = await _getEventsFromAuth(oAuth2, calendarId);
