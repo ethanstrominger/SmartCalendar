@@ -7,18 +7,8 @@ import {
   getICalEvents
 } from "../../smartCalendarTransactions";
 import { BASIC_ICS_FILE } from "./smartCalendarTransactionGlobals";
-test("Get Events List Using http", signalEndOfTest => {
-  async function testGetEventListUsingHttp() {
-    const events = await getEvents("primary", getGoogleGetEventURL());
-    expect(events).toBeDefined();
-    signalEndOfTest();
-  }
-  testGetEventListUsingHttp();
-});
 
-test("Convert iCalData to an array of events", () => {
-  const vevents = getICalEvents(BASIC_ICS_FILE);
-  const firstEvent = vevents[0];
+function verifyValidEvent(vevent) {
   const expectedAttributes = [
     "uid",
     "name",
@@ -30,9 +20,24 @@ test("Convert iCalData to an array of events", () => {
   var isAttributeValid;
   for (var i = 0; i < expectedAttributes.length; i++) {
     attribute = expectedAttributes[i].toString();
-    isAttributeValid = firstEvent.hasOwnProperty(attribute);
+    isAttributeValid = vevent.hasOwnProperty(attribute);
     expect([attribute, isAttributeValid]).toEqual([attribute, true]);
   }
+}
+
+test("Get Events List Using http", signalEndOfTest => {
+  async function testGetEventListUsingHttp() {
+    const events = await getEvents("primary", getGoogleGetEventURL());
+    expect(events).toBeDefined();
+    verifyValidEvent(events[0]);
+    signalEndOfTest();
+  }
+  testGetEventListUsingHttp();
+});
+
+test("Convert iCalData to an array of events", () => {
+  const vevents = getICalEvents(BASIC_ICS_FILE);
+  verifyValidEvent(vevents[0]);
 });
 
 // TODO Complete

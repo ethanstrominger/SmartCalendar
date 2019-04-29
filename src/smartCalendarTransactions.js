@@ -23,6 +23,7 @@ import moment from "moment";
 import fs from "fs";
 import ICAL from "ical.js";
 import { getAccessTokenString } from "./smartCalendarAuthorization";
+import { start } from "repl";
 export { getEvents, getGoogleGetEventURL, getICalEvents };
 const _CALENDARID_STR = "$calendarId";
 const _GOOGLE_GET_EVENT_URL =
@@ -33,6 +34,21 @@ function getGoogleGetEventURL(calendarId) {
   return url;
 }
 
+function _getCalDavEventAttribute(vevent) {
+  var element = {
+    uid: vevent.iCalUID,
+    name: vevent.summary,
+    starttime: vevent.start.datetime,
+    endtime: vevent.end.datetime,
+    //   vevent.getFirstPropertyValue("dtstart").toString()
+    // ).format(),
+    // endtime: moment(vevent.getFirstPropertyValue("dtend").toString()).format(),
+    description: vevent.description,
+    location: vevent.location
+  };
+  return element;
+}
+
 async function getEvents(calendarId) {
   const accessTokenString = await getAccessTokenString();
   const Http = new XMLHttpRequest();
@@ -41,7 +57,10 @@ async function getEvents(calendarId) {
   const j = await Http.send();
   return new Promise((resolve, reject) => {
     Http.onload = e => {
-      resolve(JSON.parse(Http.responseText)["items"]);
+      const mapFunction = _getCalDavEventAttribute;
+      const veventsJson = JSON.parse(Http.responseText)["items"];
+      const vevents = veventsJson.map(mapFunction);
+      resolve(vevents);
     };
   });
 }
@@ -57,6 +76,7 @@ function _getICALSubcomponents(iCalFile) {
   var jcal = ICAL.parse(iCalData);
   var vcal = new ICAL.Component(jcal);
   var vevents = vcal.getAllSubcomponents("vevent");
+
   return vevents;
 }
 
