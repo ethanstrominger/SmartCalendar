@@ -20,6 +20,7 @@
 // TODO Figure out if google, meetup, facebook, eventbrite based on credentials
 
 import moment from "moment";
+import fs from "fs";
 import ICAL from "ical.js";
 import { getAccessTokenString } from "./smartCalendarAuthorization";
 export { getEvents, getGoogleGetEventURL, getICalEvents };
@@ -45,20 +46,30 @@ async function getEvents(calendarId) {
   });
 }
 
-function getICalEvents(iCalData) {
+function getICalEvents(iCalFile) {
+  var vevents = _getICALSubcomponents(iCalFile);
+  // console.log(vevents);
+  return vevents.map(_getICalEventAtrributes);
+}
+
+function _getICALSubcomponents(iCalFile) {
+  const iCalData = fs.readFileSync(iCalFile).toString();
   var jcal = ICAL.parse(iCalData);
   var vcal = new ICAL.Component(jcal);
   var vevents = vcal.getAllSubcomponents("vevent");
-  return vevents.map(_getICalEventAtrributes);
+  return vevents;
 }
 
 function _getICalEventAtrributes(vevent) {
   var element = {
     uid: vevent.getFirstPropertyValue("uid"),
     name: vevent.getFirstPropertyValue("summary"),
-    starttime: moment(vevent.getFirstPropertyValue("dtstart")).format(),
-    endtime: moment(vevent.getFirstPropertyValue("dtend")).format(),
-    description: vevent.getFirstPropertyValue("description")
+    starttime: moment(
+      vevent.getFirstPropertyValue("dtstart").toString()
+    ).format(),
+    endtime: moment(vevent.getFirstPropertyValue("dtend").toString()).format(),
+    description: vevent.getFirstPropertyValue("description"),
+    location: vevent.getFirstPropertyValue("location")
   };
   return element;
 }
