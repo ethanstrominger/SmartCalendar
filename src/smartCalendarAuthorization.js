@@ -8,8 +8,8 @@ import fs from "fs";
 import readline from "readline";
 
 export { getAccessTokenString };
-const _SCOPES = ["https://www.googleapis.com/auth/calendar"];
-const _DEFAULT_CREDENTIAL_FILE_PREFIX = "smart-calendar";
+const _GOOGLE_SCOPES_FULL = ["https://www.googleapis.com/auth/calendar"];
+const _DEFAULT_CREDENTIAL_FILE_PREFIX = "smartcalendar";
 
 async function getAccessTokenString(
   credentialFilePrefix = _DEFAULT_CREDENTIAL_FILE_PREFIX
@@ -60,7 +60,7 @@ function _getGoogleCalCodeFromUser(oAuth2Client) {
   return new Promise(function(resolve, reject) {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: "offline",
-      scope: _SCOPES
+      scope: _GOOGLE_SCOPES_FULL
     });
     console.log("Authorize this app by visiting this url:", authUrl);
     const rl = readline.createInterface({

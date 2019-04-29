@@ -11,7 +11,7 @@ test("Get Credentials default", signalEndOfTest => {
 test("Get Credentials specify file prefix", signalEndOfTest => {
   async function testGetCredentials() {
     const accessTokenString = await getAccessTokenString(
-      "smart-calendar-enduser"
+      "smartcalendar-enduser"
     );
     expect(accessTokenString).toBeDefined();
     signalEndOfTest();
