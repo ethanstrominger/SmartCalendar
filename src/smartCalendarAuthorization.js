@@ -7,21 +7,24 @@ import { google } from "googleapis/build/src/index";
 import fs from "fs";
 import readline from "readline";
 
-export { getAccessTokenString };
-const _GOOGLE_SCOPES_FULL = ["https://www.googleapis.com/auth/calendar"];
+const GOOGLE_SCOPE_BASE_URL = "https://www.googleapis.com/auth/calendar";
 const _DEFAULT_CREDENTIAL_FILE_PREFIX = "smartcalendar";
+export { getAccessTokenString, GOOGLE_SCOPE_BASE_URL };
 
 async function getAccessTokenString(
   credentialFilePrefix = _DEFAULT_CREDENTIAL_FILE_PREFIX,
-  scope = _GOOGLE_SCOPES_FULL
+  scopeUrl = GOOGLE_SCOPE_BASE_URL
 ) {
-  const oAuth2Client = await _getGoogleCalOAuth2(credentialFilePrefix, scope);
+  const oAuth2Client = await _getGoogleCalOAuth2(
+    credentialFilePrefix,
+    scopeUrl
+  );
   const accessTokenData = await oAuth2Client.getAccessToken();
   const accessTokenString = accessTokenData.token;
   return accessTokenString;
 }
 
-async function _getGoogleCalOAuth2(credentialFilePrefix, scope) {
+async function _getGoogleCalOAuth2(credentialFilePrefix, scopeUrl) {
   const credentialFile = credentialFilePrefix + "-credentials.json";
   const tokenFile = credentialFilePrefix + "-token.json";
   const unparsedCredentials = fs.readFileSync(credentialFile);
@@ -35,14 +38,32 @@ async function _getGoogleCalOAuth2(credentialFilePrefix, scope) {
   const tokenData = await _getGoogleCalTokenData(
     oAuth2Client,
     tokenFile,
-    scope
+    scopeUrl
   );
   oAuth2Client.setCredentials(JSON.parse(tokenData));
   return oAuth2Client;
 }
 
-async function _getGoogleCalTokenDataFirstTime(oAuth2Client, tokenFile, scope) {
-  const code = await _getGoogleCalCodeFromUser(oAuth2Client, scope);
+async function _getGoogleCalTokenData(oAuth2Client, tokenFile, scopeUrl) {
+  let token = "";
+  try {
+    token = fs.readFileSync(tokenFile);
+  } catch (e) {
+    token = await _getGoogleCalTokenDataFirstTime(
+      oAuth2Client,
+      tokenFile,
+      scopeUrl
+    );
+  }
+  return token;
+}
+
+async function _getGoogleCalTokenDataFirstTime(
+  oAuth2Client,
+  tokenFile,
+  scopeUrl
+) {
+  const code = await _getGoogleCalCodeFromUser(oAuth2Client, scopeUrl);
   return new Promise(function(resolve, reject) {
     oAuth2Client.getToken(code, (err, tokenData) => {
       if (err) {
@@ -51,7 +72,7 @@ async function _getGoogleCalTokenDataFirstTime(oAuth2Client, tokenFile, scope) {
       } else {
         // oAuth2Client.setCredentials(tokenData);
         // Store the token to disk for later program executions
-        fs.writeFileSync(tokenFile, JSON.x(tokenData));
+        fs.writeFileSync(tokenFile, JSON.stringify(tokenData));
         console.log("Token stored to ", tokenFile);
         resolve(JSON.stringify(tokenData));
       }
@@ -59,11 +80,11 @@ async function _getGoogleCalTokenDataFirstTime(oAuth2Client, tokenFile, scope) {
   });
 }
 
-function _getGoogleCalCodeFromUser(oAuth2Client, scope) {
+function _getGoogleCalCodeFromUser(oAuth2Client, scopeUrl) {
   return new Promise(function(resolve, reject) {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: "offline",
-      scope: scope
+      scope: [scopeUrl]
     });
     console.log("Authorize this app by visiting this url:", authUrl);
     const rl = readline.createInterface({
@@ -75,18 +96,4 @@ function _getGoogleCalCodeFromUser(oAuth2Client, scope) {
       resolve(code);
     });
   });
-}
-
-async function _getGoogleCalTokenData(oAuth2Client, tokenFile, scope) {
-  let token = "";
-  try {
-    token = fs.readFileSync(tokenFile);
-  } catch (e) {
-    token = await _getGoogleCalTokenDataFirstTime(
-      oAuth2Client,
-      tokenFile,
-      scope
-    );
-  }
-  return token;
 }
