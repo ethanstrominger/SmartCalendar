@@ -5,7 +5,8 @@ import {
   getCalDavEventsById,
   getGoogleGetEventURL,
   getICalEvents,
-  getCalDavIdByName
+  getCalDavIdByName,
+  getCalDavEventsByName
 } from "../../smartCalendarTransactions";
 import { BASIC_ICS_FILE } from "./smartCalendarTransactionGlobals";
 
@@ -68,6 +69,19 @@ test("Get Events List Using http", signalEndOfTest => {
     signalEndOfTest();
   }
   testGetEventListUsingHttp();
+});
+
+test("Get CalDavEvents", signalEndOfTest => {
+  async function testGetCalDavEvents() {
+    const events = await getCalDavEventsByName(
+      "Sample Public Calendar",
+      "smartcalendar-publiccal-readonly"
+    );
+    expect(events).toBeDefined();
+    verifyValidEvent(events[0]);
+    signalEndOfTest();
+  }
+  testGetCalDavEvents();
 });
 
 test("Convert iCalData to an array of events", () => {

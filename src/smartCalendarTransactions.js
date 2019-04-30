@@ -50,8 +50,9 @@ function _getCalDavEventAttribute(vevent) {
   var element = {
     uid: vevent.iCalUID,
     name: vevent.summary,
-    starttime: vevent.start.datetime,
-    endtime: vevent.end.datetime,
+    starttime: vevent.start.dateTime,
+    endtime: vevent.end.dateTime,
+    timezone: vevent.end.timeZone,
     //   vevent.getFirstPropertyValue("dtstart").toString()
     // ).format(),
     // endtime: moment(vevent.getFirstPropertyValue("dtend").toString()).format(),
@@ -81,7 +82,7 @@ async function getCalDavIdByName(calendarName, prefix) {
 }
 
 async function getCalDavEventsByName(calendarName, prefix) {
-  const calendarId = getCalDavIdByName(calendarName, prefix);
+  const calendarId = await getCalDavIdByName(calendarName, prefix);
   return getCalDavEventsById(calendarId, prefix);
 }
 
