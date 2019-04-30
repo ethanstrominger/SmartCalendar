@@ -9,22 +9,22 @@ import readline from "readline";
 
 const GOOGLE_SCOPE_BASE_URL = "https://www.googleapis.com/auth/calendar";
 const _DEFAULT_CREDENTIAL_FILE_PREFIX = "smartcalendar";
-export { getAccessTokenString, GOOGLE_SCOPE_BASE_URL };
+export { getAccessTokenString, getGoogleCalOAuth2, GOOGLE_SCOPE_BASE_URL };
 
 async function getAccessTokenString(
   credentialFilePrefix = _DEFAULT_CREDENTIAL_FILE_PREFIX,
   scopeUrl = GOOGLE_SCOPE_BASE_URL
 ) {
-  const oAuth2Client = await _getGoogleCalOAuth2(
-    credentialFilePrefix,
-    scopeUrl
-  );
+  const oAuth2Client = await getGoogleCalOAuth2(credentialFilePrefix, scopeUrl);
   const accessTokenData = await oAuth2Client.getAccessToken();
   const accessTokenString = accessTokenData.token;
   return accessTokenString;
 }
 
-async function _getGoogleCalOAuth2(credentialFilePrefix, scopeUrl) {
+async function getGoogleCalOAuth2(
+  credentialFilePrefix,
+  scopeUrl = GOOGLE_SCOPE_BASE_URL
+) {
   const credentialFile = credentialFilePrefix + "-credentials.json";
   const tokenFile = credentialFilePrefix + "-token.json";
   const unparsedCredentials = fs.readFileSync(credentialFile);

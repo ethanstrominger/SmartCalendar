@@ -2,9 +2,10 @@
 // TODO Remove duplicate code, create function to check valid events (const expectedAttributes = ["uid","name","starttime","endtime","description"];)
 
 import {
-  getEvents,
+  getCalDavEventsById,
   getGoogleGetEventURL,
-  getICalEvents
+  getICalEvents,
+  getCalDavIdByName
 } from "../../smartCalendarTransactions";
 import { BASIC_ICS_FILE } from "./smartCalendarTransactionGlobals";
 
@@ -25,9 +26,43 @@ function verifyValidEvent(vevent) {
   }
 }
 
+test("Get Event ID by name", signalEndOfTest => {
+  async function testGetEventIdByName() {
+    const id = await getCalDavIdByName(
+      "Sample Public Calendar",
+      "smartcalendar-publiccal-readonly"
+    );
+    expect(id).toBeDefined();
+    signalEndOfTest();
+  }
+  testGetEventIdByName();
+});
+
+test("Get Event ID by name not found", signalEndOfTest => {
+  async function testGetEventIdByName() {
+    let errored = false;
+    const id = await getCalDavIdByName(
+      "xxxxxxx",
+      "smartcalendar-publiccal-readonly"
+    )
+      .then(result => {
+        errored = false;
+      })
+      .catch(e => {
+        errored = true;
+      });
+    expect(errored).toBeTruthy();
+    signalEndOfTest();
+  }
+  testGetEventIdByName();
+});
+
 test("Get Events List Using http", signalEndOfTest => {
   async function testGetEventListUsingHttp() {
-    const events = await getEvents("primary", getGoogleGetEventURL());
+    const events = await getCalDavEventsById(
+      "primary",
+      "smartcalendar-publiccal-readonly"
+    );
     expect(events).toBeDefined();
     verifyValidEvent(events[0]);
     signalEndOfTest();

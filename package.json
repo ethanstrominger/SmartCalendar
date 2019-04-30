@@ -12,7 +12,8 @@
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-scripts": "^2.1.8",
-    "readline-sync": "^1.4.9"
+    "readline-sync": "^1.4.9",
+    "xmlhttprequest": "^1.8.0"
   },
   "scripts": {
     "start": "react-scripts start",

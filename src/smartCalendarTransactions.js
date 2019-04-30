@@ -19,12 +19,24 @@
 // TODO Add eventBrite
 // TODO Figure out if google, meetup, facebook, eventbrite based on credentials
 
+import { XMLHttpRequest } from "xmlhttprequest";
+import { google } from "googleApis";
+
 import moment from "moment";
 import fs from "fs";
 import ICAL from "ical.js";
-import { getAccessTokenString } from "./smartCalendarAuthorization";
-import { start } from "repl";
-export { getEvents, getGoogleGetEventURL, getICalEvents };
+import {
+  getAccessTokenString,
+  getGoogleCalOAuth2
+} from "./smartCalendarAuthorization";
+// import { start } from "repl";
+export {
+  getCalDavEventsById,
+  getGoogleGetEventURL,
+  getICalEvents,
+  getCalDavIdByName,
+  getCalDavEventsByName
+};
 const _CALENDARID_STR = "$calendarId";
 const _GOOGLE_GET_EVENT_URL =
   "https://www.googleapis.com/calendar/v3/calendars/$calendarId/events";
@@ -49,8 +61,32 @@ function _getCalDavEventAttribute(vevent) {
   return element;
 }
 
-async function getEvents(calendarId) {
-  const accessTokenString = await getAccessTokenString();
+async function getCalDavIdByName(calendarName, prefix) {
+  const oauth2Client = await getGoogleCalOAuth2(prefix);
+  var calendar = await google.calendar("v3");
+  return new Promise((resolve, reject) => {
+    calendar.calendarList.list({ auth: oauth2Client }, function(err, resp) {
+      var found = resp.data.items.some(function(cal) {
+        if (cal.summary == calendarName) {
+          resolve(cal.id);
+          return true;
+        }
+        // return false;
+      });
+      if (!found) {
+        reject("No such calendar " + calendarName);
+      }
+    });
+  });
+}
+
+async function getCalDavEventsByName(calendarName, prefix) {
+  const calendarId = getCalDavIdByName(calendarName, prefix);
+  return getCalDavEventsById(calendarId, prefix);
+}
+
+async function getCalDavEventsById(calendarId, prefix) {
+  const accessTokenString = await getAccessTokenString(prefix);
   const Http = new XMLHttpRequest();
   Http.open("GET", getGoogleGetEventURL(calendarId));
   Http.setRequestHeader("Authorization", "Bearer " + accessTokenString);
