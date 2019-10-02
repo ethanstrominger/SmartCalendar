@@ -1,4 +1,10 @@
-# Experimental phase
+# Functionality
+
+The Smart Calendar app queries event calendars on the web based on criteria you specify and consolidates the events into one of your Google calendars based on criteria you specify. You are notified when new events match your criteria and when the date, time, or location of already synchorinized events changed.
+
+The current version works from the command line. The first time you use the app, you'll be asked to authorize the app to access your calendar and download the token on to your laptop.
+
+# Technology
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
